@@ -143,7 +143,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ onEditCategory, onDeleteCateg
             emails={emails.filter(email => !email.category)}
             onEmailClick={handleEmailClick}
           />
-          {categories.map(category => (
+          {categories?.map(category => (
             <KanbanColumn
               key={category.id}
               id={category.id.toString()}

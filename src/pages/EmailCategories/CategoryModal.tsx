@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -24,6 +24,9 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
   onSave,
   category,
 }) => {
+  const [emailTags, setEmailTags] = useState<string[]>([]);
+  const [currentEmail, setCurrentEmail] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -41,6 +44,11 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
   useEffect(() => {
     if (category) {
       reset(category);
+      setEmailTags(
+        category.target_emails
+          ? category.target_emails.split(",").map((email) => email.trim())
+          : []
+      );
     } else {
       reset({
         name: "",
@@ -48,24 +56,52 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
         instructions: "",
         target_emails: "",
       });
+      setEmailTags([]);
     }
   }, [category, reset]);
 
-  const onSubmit = (data: Category) => {
-    // Clean up target emails - remove any extra spaces and empty entries
-    const cleanedEmails = data.target_emails
-      ? data.target_emails
-          .split(",")
-          .map((email) => email.trim())
-          .filter((email) => email)
-          .join(",")
-      : "";
+  const handleEmailInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value.endsWith(",")) {
+      const email = value.slice(0, -1).trim();
+      if (email && !emailTags.includes(email)) {
+        setEmailTags([...emailTags, email]);
+      }
+      setCurrentEmail("");
+    } else {
+      setCurrentEmail(value);
+    }
+  };
 
-    onSave({
+  const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (currentEmail.trim() && !emailTags.includes(currentEmail.trim())) {
+        setEmailTags([...emailTags, currentEmail.trim()]);
+        setCurrentEmail("");
+      }
+    } else if (
+      e.key === "Backspace" &&
+      currentEmail === "" &&
+      emailTags.length > 0
+    ) {
+      setEmailTags(emailTags.slice(0, -1));
+    }
+  };
+
+  const removeEmailTag = (emailToRemove: string) => {
+    setEmailTags(emailTags.filter((email) => email !== emailToRemove));
+  };
+
+  const onSubmit = (data: Category) => {
+    const formData = {
       ...data,
-      target_emails: cleanedEmails,
-    });
+      target_emails: emailTags.join(","),
+    };
+    onSave(formData);
     reset();
+    setEmailTags([]);
+    setCurrentEmail("");
   };
 
   return (
@@ -134,7 +170,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                               message: "Name must be at least 2 characters",
                             },
                           })}
-                          className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
+                          className={`mt-1 p-2 block w-full rounded-md border shadow-sm sm:text-sm ${
                             errors.name
                               ? "border-red-300 focus:border-red-500 focus:ring-red-500"
                               : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
@@ -165,7 +201,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                                 "Description must be at least 10 characters",
                             },
                           })}
-                          className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
+                          className={`mt-1 p-2 border block w-full rounded-md shadow-sm sm:text-sm ${
                             errors.description
                               ? "border-red-300 focus:border-red-500 focus:ring-red-500"
                               : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
@@ -183,17 +219,37 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                           htmlFor="target_emails"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Target Emails (comma-separated)
+                          Target Emails
                         </label>
-                        <input
-                          type="text"
-                          id="target_emails"
-                          {...register("target_emails")}
-                          placeholder="email1@example.com, email2@example.com"
-                          className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                        />
+                        <div className="mt-1 p-2 border rounded-md border-gray-300 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
+                          <div className="flex flex-wrap gap-2">
+                            {emailTags.map((email, index) => (
+                              <span
+                                key={index}
+                                className="inline-flex items-center px-2.5 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+                              >
+                                {email}
+                                <button
+                                  type="button"
+                                  onClick={() => removeEmailTag(email)}
+                                  className="ml-1.5 inline-flex items-center justify-center text-blue-400 hover:text-blue-600"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </span>
+                            ))}
+                            <input
+                              type="text"
+                              value={currentEmail}
+                              onChange={handleEmailInputChange}
+                              onKeyDown={handleEmailKeyDown}
+                              placeholder="Type email and press comma or enter"
+                              className="flex-1 p-2 min-w-[200px] outline-none border-0 focus:ring-0 p-1 text-sm"
+                            />
+                          </div>
+                        </div>
                         <p className="mt-1 text-sm text-gray-500">
-                          Enter multiple email addresses separated by commas
+                          Press comma or enter to add multiple emails
                         </p>
                       </div>
 
@@ -208,7 +264,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                           id="instructions"
                           rows={3}
                           {...register("instructions")}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                         />
                       </div>
 
@@ -225,6 +281,8 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                           onClick={() => {
                             onClose();
                             reset();
+                            setEmailTags([]);
+                            setCurrentEmail("");
                           }}
                         >
                           Cancel
