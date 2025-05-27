@@ -15,9 +15,10 @@ interface Email {
 
 interface KanbanItemProps {
   email: Email;
+  onClick: () => void;
 }
 
-const KanbanItem: React.FC<KanbanItemProps> = ({ email }) => {
+const KanbanItem: React.FC<KanbanItemProps> = ({ email, onClick }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: email.id,
@@ -43,31 +44,43 @@ const KanbanItem: React.FC<KanbanItemProps> = ({ email }) => {
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
-      className={`bg-white rounded-lg shadow p-4 cursor-move ${
+      className={`relative bg-white rounded-lg shadow p-4 ${
         isDragging ? "opacity-50" : ""
       } ${email.status !== "read" ? "border-l-4 border-blue-500" : ""} ${
         email.urgent_text ? "border-l-4 border-red-500" : ""
       }`}
     >
-      <div className="flex items-start gap-3">
-        <Mail className="h-5 w-5 text-gray-400 flex-shrink-0 mt-1" />
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-gray-900 truncate">
-            {email.subject}
-          </p>
-          <p className="text-sm text-gray-500 truncate">{email.sender}</p>
-          {email.summary && (
-            <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-              {email.summary}
+      <div
+        className="relative z-10 cursor-pointer"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick();
+        }}
+      >
+        <div className="flex items-start gap-3">
+          <Mail className="h-5 w-5 text-gray-400 flex-shrink-0 mt-1" />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-gray-900 truncate">
+              {email.subject}
             </p>
-          )}
-          <p className="text-xs text-gray-400 mt-1">
-            {formatDate(email.created_at)}
-          </p>
+            <p className="text-sm text-gray-500 truncate">{email.sender}</p>
+            {email.summary && (
+              <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                {email.summary}
+              </p>
+            )}
+            <p className="text-xs text-gray-400 mt-1">
+              {formatDate(email.created_at)}
+            </p>
+          </div>
         </div>
       </div>
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute inset-0 cursor-move"
+        style={{ touchAction: "none" }}
+      />
     </div>
   );
 };

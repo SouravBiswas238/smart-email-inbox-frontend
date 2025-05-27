@@ -31,9 +31,9 @@ const Dashboard: React.FC = () => {
           <a href="/dashboard/appointments" className="flex flex-col items-center py-2 text-gray-600">
             <span className="text-xs">Appointments</span>
           </a>
-          <a href="/dashboard/settings" className="flex flex-col items-center py-2 text-gray-600">
+          {/* <a href="/dashboard/settings" className="flex flex-col items-center py-2 text-gray-600">
             <span className="text-xs">Settings</span>
-          </a>
+          </a> */}
         </div>
       </div>
 

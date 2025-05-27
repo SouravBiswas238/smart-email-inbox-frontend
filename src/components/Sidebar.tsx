@@ -37,9 +37,9 @@ const Sidebar: React.FC = () => {
       <div className="flex flex-col flex-grow p-4 space-y-1">
         {navItems.map((item) => (
           <NavLink
-            key={item.path}
-            to={item.path}
-            end={item.path === "/dashboard"}
+            key={item?.path}
+            to={item?.path}
+            end={item?.path === "/dashboard"}
             className={({ isActive }) =>
               `flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${
                 isActive

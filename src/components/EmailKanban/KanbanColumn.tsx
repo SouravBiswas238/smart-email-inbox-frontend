@@ -1,9 +1,9 @@
-import React from 'react';
-import { useDroppable } from '@dnd-kit/core';
-import { MoreVertical } from 'lucide-react';
-import { Menu } from '@headlessui/react';
-import KanbanItem from './KanbanItem';
-import Swal from 'sweetalert2';
+import React from "react";
+import { useDroppable } from "@dnd-kit/core";
+import { MoreVertical } from "lucide-react";
+import { Menu } from "@headlessui/react";
+import KanbanItem from "./KanbanItem";
+import Swal from "sweetalert2";
 
 interface Email {
   id: number;
@@ -12,6 +12,8 @@ interface Email {
   body: string;
   status: string;
   created_at: string;
+  summary: string;
+  urgent_text: string | null;
 }
 
 interface KanbanColumnProps {
@@ -20,22 +22,30 @@ interface KanbanColumnProps {
   emails: Email[];
   onEdit?: () => void;
   onDelete?: () => void;
+  onEmailClick: (email: Email) => void;
 }
 
-const KanbanColumn: React.FC<KanbanColumnProps> = ({ id, title, emails, onEdit, onDelete }) => {
+const KanbanColumn: React.FC<KanbanColumnProps> = ({
+  id,
+  title,
+  emails,
+  onEdit,
+  onDelete,
+  onEmailClick,
+}) => {
   const { setNodeRef } = useDroppable({
     id: id,
   });
 
   const handleDelete = async () => {
     const result = await Swal.fire({
-      title: 'Are you sure?',
+      title: "Are you sure?",
       text: "You won't be able to revert this!",
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!'
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
     });
 
     if (result.isConfirmed && onDelete) {
@@ -51,12 +61,10 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ id, title, emails, onEdit, 
       <div className="p-4 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-lg font-medium text-gray-900">
           {title}
-          <span className="ml-2 text-sm text-gray-500">
-            ({emails.length})
-          </span>
+          <span className="ml-2 text-sm text-gray-500">({emails.length})</span>
         </h3>
 
-        {id !== 'uncategorized' && (
+        {id !== "uncategorized" && (
           <Menu as="div" className="relative">
             <Menu.Button className="flex items-center text-gray-400 hover:text-gray-600">
               <MoreVertical className="h-5 w-5" />
@@ -68,7 +76,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ id, title, emails, onEdit, 
                     <button
                       onClick={onEdit}
                       className={`${
-                        active ? 'bg-gray-100' : ''
+                        active ? "bg-gray-100" : ""
                       } block px-4 py-2 text-sm text-gray-700 w-full text-left`}
                     >
                       Edit Category
@@ -80,7 +88,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ id, title, emails, onEdit, 
                     <button
                       onClick={handleDelete}
                       className={`${
-                        active ? 'bg-gray-100' : ''
+                        active ? "bg-gray-100" : ""
                       } block px-4 py-2 text-sm text-red-600 w-full text-left`}
                     >
                       Delete Category
@@ -92,12 +100,16 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ id, title, emails, onEdit, 
           </Menu>
         )}
       </div>
-      
+
       <div className="p-4 space-y-4">
-        {emails.map(email => (
-          <KanbanItem key={email.id} email={email} />
+        {emails.map((email) => (
+          <KanbanItem
+            key={email.id}
+            email={email}
+            onClick={() => onEmailClick(email)}
+          />
         ))}
-        
+
         {emails.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             No emails in this category
