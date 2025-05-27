@@ -44,13 +44,15 @@ interface Category {
 interface KanbanBoardProps {
   onEditCategory?: (category: Category) => void;
   onDeleteCategory?: (id: number) => void;
+  categories: Category[];
 }
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({
   onEditCategory,
   onDeleteCategory,
+  categories,
 }) => {
-  const [categories, setCategories] = useState<Category[]>([]);
+  //   const [categories, setCategories] = useState<Category[]>([]);
   const [emails, setEmails] = useState<Email[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +70,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
         emailCategoryApi.getAll(),
         emailApi.getAll(),
       ]);
-      setCategories(categoriesResponse.data);
+      //   setCategories(categoriesResponse.data);
       setEmails(emailsResponse.data);
     } catch (err) {
       console.error("Failed to fetch data:", err);
@@ -135,14 +137,14 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
         />
         {categories.map((category) => (
           <KanbanColumn
-            key={category.id}
-            id={category.id.toString()}
-            title={category.name}
-            emails={emails.filter(
-              (email) => email.category?.id === category.id
+            key={category?.id}
+            id={category?.id?.toString()}
+            title={category?.name}
+            emails={emails?.filter(
+              (email) => email?.category?.id === category?.id
             )}
             onEdit={() => onEditCategory?.(category)}
-            onDelete={() => onDeleteCategory?.(category.id)}
+            onDelete={() => onDeleteCategory?.(category?.id)}
           />
         ))}
       </div>

@@ -17,7 +17,8 @@ export const emailApi = {
     status?: string;
   }) => api.get("/inbox/email/get-all", { params }),
   getById: (id: number) => api.get(`/inbox/email/get/${id}`),
-  update: (id: number, data: any) => api.put(`/inbox/email/update/${id}`, data),
+  update: (id: number, data: any) =>
+    api.patch(`/inbox/email/update/${id}`, data),
   delete: (id: number) => api.delete(`/inbox/email/delete/${id}`),
   createTest: (data: any) => api.post("/inbox/test-email-creation", data),
 };
@@ -28,15 +29,16 @@ export const emailCategoryApi = {
   create: (data: any) => api.post("/inbox/email-category/create", data),
   getById: (id: number) => api.get(`/inbox/email-category/get/${id}`),
   update: (id: number, data: any) =>
-    api.put(`/inbox/email-category/update/${id}`, data),
+    api.patch(`/inbox/email-category/update/${id}`, data),
   delete: (id: number) => api.delete(`/inbox/email-category/delete/${id}`),
 };
 
 // Appointment API endpoints
 export const appointmentApi = {
-  getAll: () => api.get("/appointment/get-all"),
-  create: (data: any) => api.post("/appointment/create", data),
-  getById: (id: number) => api.get(`/appointment/get/${id}`),
-  update: (id: number, data: any) => api.put(`/appointment/update/${id}`, data),
-  delete: (id: number) => api.delete(`/appointment/delete/${id}`),
+  getAll: () => api.get("/management/appointment/get-all"),
+  create: (data: any) => api.post("/management/appointment/create", data),
+  getById: (id: number) => api.get(`/management/appointment/get/${id}`),
+  update: (id: number, data: any) =>
+    api.patch(`/management/appointment/update/${id}`, data),
+  delete: (id: number) => api.delete(`/management/appointment/delete/${id}`),
 };

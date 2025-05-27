@@ -1,6 +1,7 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { X } from 'lucide-react';
+import React, { Fragment, useEffect } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { X } from "lucide-react";
+import { useForm } from "react-hook-form";
 
 interface Category {
   id?: number;
@@ -20,36 +21,36 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
   isOpen,
   onClose,
   onSave,
-  category
+  category,
 }) => {
-  const [formData, setFormData] = useState<Category>({
-    name: '',
-    description: '',
-    instructions: ''
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<Category>({
+    defaultValues: {
+      name: "",
+      description: "",
+      instructions: "",
+    },
   });
 
   useEffect(() => {
     if (category) {
-      setFormData(category);
+      reset(category);
     } else {
-      setFormData({
-        name: '',
-        description: '',
-        instructions: ''
+      reset({
+        name: "",
+        description: "",
+        instructions: "",
       });
     }
-  }, [category]);
+  }, [category, reset]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const onSubmit = (data: Category) => {
+    onSave(data);
+    reset();
   };
 
   return (
@@ -91,51 +92,89 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                 </div>
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                    <Dialog.Title as="h3" className="text-lg font-semibold leading-6 text-gray-900">
-                      {category ? 'Edit Category' : 'Create New Category'}
+                    <Dialog.Title
+                      as="h3"
+                      className="text-lg font-semibold leading-6 text-gray-900"
+                    >
+                      {category ? "Edit Category" : "Create New Category"}
                     </Dialog.Title>
-                    <form onSubmit={handleSubmit} className="mt-6 space-y-6">
+                    <form
+                      onSubmit={handleSubmit(onSubmit)}
+                      className="mt-6 space-y-6"
+                    >
                       <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                        <label
+                          htmlFor="name"
+                          className="block text-sm font-medium text-gray-700"
+                        >
                           Category Name
                         </label>
                         <input
                           type="text"
-                          name="name"
                           id="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                          required
+                          {...register("name", {
+                            required: "Category name is required",
+                            minLength: {
+                              value: 2,
+                              message: "Name must be at least 2 characters",
+                            },
+                          })}
+                          className={`mt-1 p-2 block w-full rounded-md shadow-sm sm:text-sm ${
+                            errors.name
+                              ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                          }`}
                         />
+                        {errors.name && (
+                          <p className="mt-1 p-2 text-sm text-red-600">
+                            {errors.name.message}
+                          </p>
+                        )}
                       </div>
 
                       <div>
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                        <label
+                          htmlFor="description"
+                          className="block text-sm font-medium text-gray-700"
+                        >
                           Description
                         </label>
                         <textarea
-                          name="description"
                           id="description"
                           rows={3}
-                          value={formData.description}
-                          onChange={handleChange}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                          required
+                          {...register("description", {
+                            required: "Description is required",
+                            minLength: {
+                              value: 10,
+                              message:
+                                "Description must be at least 10 characters",
+                            },
+                          })}
+                          className={`mt-1 p-2 block w-full rounded-md shadow-sm sm:text-sm ${
+                            errors.description
+                              ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                          }`}
                         />
+                        {errors.description && (
+                          <p className="mt-1 p-2 text-sm text-red-600">
+                            {errors.description.message}
+                          </p>
+                        )}
                       </div>
 
                       <div>
-                        <label htmlFor="instructions" className="block text-sm font-medium text-gray-700">
+                        <label
+                          htmlFor="instructions"
+                          className="block text-sm font-medium text-gray-700"
+                        >
                           Instructions (Optional)
                         </label>
                         <textarea
-                          name="instructions"
                           id="instructions"
                           rows={3}
-                          value={formData.instructions}
-                          onChange={handleChange}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          {...register("instructions")}
+                          className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                         />
                       </div>
 
@@ -144,12 +183,15 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                           type="submit"
                           className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
                         >
-                          {category ? 'Save Changes' : 'Create Category'}
+                          {category ? "Save Changes" : "Create Category"}
                         </button>
                         <button
                           type="button"
                           className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                          onClick={onClose}
+                          onClick={() => {
+                            onClose();
+                            reset();
+                          }}
                         >
                           Cancel
                         </button>

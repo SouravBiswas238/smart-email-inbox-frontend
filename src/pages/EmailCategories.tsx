@@ -16,7 +16,7 @@ interface Category {
 }
 
 const EmailCategories: React.FC = () => {
-  const [view, setView] = useState<"list" | "kanban">("list");
+  const [view, setView] = useState<"list" | "kanban">("kanban");
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +83,7 @@ const EmailCategories: React.FC = () => {
           categoryData
         );
         setCategories(
-          categories.map((cat) =>
+          categories?.map((cat) =>
             cat.id === editingCategory.id ? response.data : cat
           )
         );
@@ -161,6 +161,8 @@ const EmailCategories: React.FC = () => {
           </div>
         ) : view === "kanban" ? (
           <KanbanBoard
+            setCategories={setCategories}
+            categories={categories}
             onEditCategory={handleEditCategory}
             onDeleteCategory={handleDeleteCategory}
           />
