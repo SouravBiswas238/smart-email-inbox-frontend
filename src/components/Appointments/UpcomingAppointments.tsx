@@ -1,5 +1,4 @@
 import React from 'react';
-import { format, parseISO } from 'date-fns';
 import { CalendarIcon, MapPin } from 'lucide-react';
 
 interface Appointment {
@@ -32,7 +31,7 @@ const UpcomingAppointments: React.FC<UpcomingAppointmentsProps> = ({
             <div className="mt-2 space-y-1 text-sm">
               <div className="flex items-center text-gray-500">
                 <CalendarIcon className="h-4 w-4 mr-1" />
-                {format(parseISO(appointment.appointment_datetime), 'PPpp')}
+                {appointment.appointment_datetime.slice(0, -1)} UTC
               </div>
               {appointment.appointment_location && (
                 <div className="flex items-center text-gray-500">

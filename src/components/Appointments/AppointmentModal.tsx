@@ -1,24 +1,11 @@
-import React from 'react';
-import { Dialog, Transition } from '@headlessui/react';
-import { X } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { format } from 'date-fns';
+import React from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { X, User, Mail, Phone, Calendar, MapPin, FileText } from "lucide-react";
 
-interface AppointmentFormData {
-  name: string;
-  email_address: string;
-  phone: string;
-  appointment_datetime: string;
-  appointment_type: string;
-  appointment_location: string;
-  appointment_notes: string;
-}
-
-interface AppointmentModalProps {
+interface AppointmentViewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: AppointmentFormData) => void;
-  initialData?: {
+  appointment: {
     id: number;
     name: string;
     email_address: string | null;
@@ -28,74 +15,15 @@ interface AppointmentModalProps {
     appointment_location: string | null;
     appointment_notes: string | null;
     status: string;
-  };
+  } | null;
 }
 
-const appointmentTypes = [
-  { value: 'consultation', label: 'Consultation' },
-  { value: 'follow_up', label: 'Follow-up' },
-  { value: 'check_up', label: 'Check-up' },
-  { value: 'treatment', label: 'Treatment' },
-  { value: 'review', label: 'Review' },
-  { value: 'interview', label: 'Interview' },
-  { value: 'meeting', label: 'Meeting' },
-  { value: 'other', label: 'Other' }
-];
-
-const AppointmentModal: React.FC<AppointmentModalProps> = ({
+const AppointmentViewModal: React.FC<AppointmentViewModalProps> = ({
   isOpen,
   onClose,
-  onSave,
-  initialData
+  appointment,
 }) => {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<AppointmentFormData>({
-    defaultValues: initialData ? {
-      name: initialData.name,
-      email_address: initialData.email_address || '',
-      phone: initialData.phone || '',
-      appointment_datetime: format(new Date(initialData.appointment_datetime), "yyyy-MM-dd'T'HH:mm"),
-      appointment_type: initialData.appointment_type || '',
-      appointment_location: initialData.appointment_location || '',
-      appointment_notes: initialData.appointment_notes || ''
-    } : {
-      name: '',
-      email_address: '',
-      phone: '',
-      appointment_datetime: '',
-      appointment_type: '',
-      appointment_location: '',
-      appointment_notes: ''
-    }
-  });
-
-  React.useEffect(() => {
-    if (initialData) {
-      reset({
-        name: initialData.name,
-        email_address: initialData.email_address || '',
-        phone: initialData.phone || '',
-        appointment_datetime: format(new Date(initialData.appointment_datetime), "yyyy-MM-dd'T'HH:mm"),
-        appointment_type: initialData.appointment_type || '',
-        appointment_location: initialData.appointment_location || '',
-        appointment_notes: initialData.appointment_notes || ''
-      });
-    } else {
-      reset({
-        name: '',
-        email_address: '',
-        phone: '',
-        appointment_datetime: '',
-        appointment_type: '',
-        appointment_location: '',
-        appointment_notes: ''
-      });
-    }
-  }, [initialData, reset]);
-
-  const onSubmit = (data: AppointmentFormData) => {
-    onSave(data);
-    reset();
-  };
+  if (!appointment) return null;
 
   return (
     <Transition.Root show={isOpen} as={React.Fragment}>
@@ -134,134 +62,127 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({
                     <X className="h-6 w-6" />
                   </button>
                 </div>
+
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                    <Dialog.Title as="h3" className="text-lg font-semibold leading-6 text-gray-900">
-                      {initialData ? 'Edit Appointment' : 'New Appointment'}
+                    <Dialog.Title
+                      as="h3"
+                      className="text-lg font-semibold leading-6 text-gray-900 mb-4"
+                    >
+                      Appointment Details
                     </Dialog.Title>
-                    <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
-                      <div className="space-y-4">
+
+                    <div className="mt-4 space-y-6">
+                      <div className="flex items-center gap-3">
+                        <User className="h-5 w-5 text-gray-400" />
                         <div>
-                          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                          <p className="text-sm font-medium text-gray-500">
                             Name
-                          </label>
-                          <input
-                            type="text"
-                            id="name"
-                            {...register('name', { required: 'Name is required' })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
-                          />
-                          {errors.name && (
-                            <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-                          )}
+                          </p>
+                          <p className="text-base text-gray-900">
+                            {appointment.name}
+                          </p>
                         </div>
+                      </div>
 
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                      {appointment.email_address && (
+                        <div className="flex items-center gap-3">
+                          <Mail className="h-5 w-5 text-gray-400" />
                           <div>
-                            <label htmlFor="email_address" className="block text-sm font-medium text-gray-700">
+                            <p className="text-sm font-medium text-gray-500">
                               Email
-                            </label>
-                            <input
-                              type="email"
-                              id="email_address"
-                              {...register('email_address')}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
-                            />
+                            </p>
+                            <p className="text-base text-gray-900">
+                              {appointment.email_address}
+                            </p>
                           </div>
+                        </div>
+                      )}
 
+                      {appointment.phone && (
+                        <div className="flex items-center gap-3">
+                          <Phone className="h-5 w-5 text-gray-400" />
                           <div>
-                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                            <p className="text-sm font-medium text-gray-500">
                               Phone
-                            </label>
-                            <input
-                              type="tel"
-                              id="phone"
-                              {...register('phone')}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
-                            />
+                            </p>
+                            <p className="text-base text-gray-900">
+                              {appointment.phone}
+                            </p>
                           </div>
                         </div>
+                      )}
 
+                      <div className="flex items-center gap-3">
+                        <Calendar className="h-5 w-5 text-gray-400" />
                         <div>
-                          <label htmlFor="appointment_datetime" className="block text-sm font-medium text-gray-700">
-                            Date & Time
-                          </label>
-                          <input
-                            type="datetime-local"
-                            id="appointment_datetime"
-                            {...register('appointment_datetime', { required: 'Date and time are required' })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
-                          />
-                          {errors.appointment_datetime && (
-                            <p className="mt-1 text-sm text-red-600">{errors.appointment_datetime.message}</p>
-                          )}
+                          <p className="text-sm font-medium text-gray-500">
+                            Date & Time (UTC)
+                          </p>
+                          <p className="text-base text-gray-900">
+                            {appointment.appointment_datetime.slice(0, -1)} UTC
+                          </p>
                         </div>
+                      </div>
 
-                        <div>
-                          <label htmlFor="appointment_type" className="block text-sm font-medium text-gray-700">
-                            Appointment Type
-                          </label>
-                          <select
-                            id="appointment_type"
-                            {...register('appointment_type', { required: 'Appointment type is required' })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
-                          >
-                            <option value="">Select a type</option>
-                            {appointmentTypes.map(type => (
-                              <option key={type.value} value={type.value}>
-                                {type.label}
-                              </option>
-                            ))}
-                          </select>
-                          {errors.appointment_type && (
-                            <p className="mt-1 text-sm text-red-600">{errors.appointment_type.message}</p>
-                          )}
+                      {appointment.appointment_type && (
+                        <div className="flex items-center gap-3">
+                          <FileText className="h-5 w-5 text-gray-400" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">
+                              Type
+                            </p>
+                            <p className="text-base text-gray-900">
+                              {appointment.appointment_type}
+                            </p>
+                          </div>
                         </div>
+                      )}
 
-                        <div>
-                          <label htmlFor="appointment_location" className="block text-sm font-medium text-gray-700">
-                            Location
-                          </label>
-                          <input
-                            type="text"
-                            id="appointment_location"
-                            {...register('appointment_location')}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
-                          />
+                      {appointment.appointment_location && (
+                        <div className="flex items-center gap-3">
+                          <MapPin className="h-5 w-5 text-gray-400" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">
+                              Location
+                            </p>
+                            <p className="text-base text-gray-900">
+                              {appointment.appointment_location}
+                            </p>
+                          </div>
                         </div>
+                      )}
 
-                        <div>
-                          <label htmlFor="appointment_notes" className="block text-sm font-medium text-gray-700">
+                      {appointment.appointment_notes && (
+                        <div className="mt-6">
+                          <p className="text-sm font-medium text-gray-500 mb-2">
                             Notes
-                          </label>
-                          <textarea
-                            id="appointment_notes"
-                            rows={3}
-                            {...register('appointment_notes')}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
-                          />
+                          </p>
+                          <p className="text-base text-gray-900 whitespace-pre-wrap">
+                            {appointment.appointment_notes}
+                          </p>
                         </div>
-                      </div>
+                      )}
 
-                      <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                        <button
-                          type="submit"
-                          className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
+                      <div className="mt-6">
+                        <p className="text-sm font-medium text-gray-500 mb-2">
+                          Status
+                        </p>
+                        <span
+                          className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                            appointment.status === "pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : appointment.status === "confirmed"
+                              ? "bg-green-100 text-green-800"
+                              : appointment.status === "cancelled"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
                         >
-                          {initialData ? 'Save Changes' : 'Create Appointment'}
-                        </button>
-                        <button
-                          type="button"
-                          className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                          onClick={() => {
-                            onClose();
-                            reset();
-                          }}
-                        >
-                          Cancel
-                        </button>
+                          {appointment.status}
+                        </span>
                       </div>
-                    </form>
+                    </div>
                   </div>
                 </div>
               </Dialog.Panel>
@@ -273,4 +194,4 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({
   );
 };
 
-export default AppointmentModal;
+export default AppointmentViewModal;

@@ -1,14 +1,6 @@
-import React from "react";
-import { format, parseISO, isToday, isSameDay } from "date-fns";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  MapPin,
-  Edit2,
-  Eye,
-  Trash2,
-} from "lucide-react";
+import React from 'react';
+import { format, parseISO, isToday, isSameDay } from 'date-fns';
+import { ChevronLeft, ChevronRight, Clock, MapPin, Edit2, Trash2, Eye } from 'lucide-react';
 
 interface Appointment {
   id: number;
@@ -25,8 +17,8 @@ interface CalendarViewProps {
   appointments: Appointment[];
   selectedDateAppointments: Appointment[];
   onEdit: (appointment: Appointment) => void;
-  onView: (appointment: Appointment) => void;
   onDelete: (id: number) => void;
+  onView: (appointment: Appointment) => void;
 }
 
 const CalendarView: React.FC<CalendarViewProps> = ({
@@ -35,8 +27,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   appointments,
   selectedDateAppointments,
   onEdit,
-  onView,
   onDelete,
+  onView
 }) => {
   const getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();
@@ -49,33 +41,33 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   const generateCalendarDays = () => {
     const year = selectedDate.getFullYear();
     const month = selectedDate.getMonth();
-
+    
     const daysInMonth = getDaysInMonth(year, month);
     const firstDayOfMonth = getFirstDayOfMonth(year, month);
-
+    
     const days = [];
-
+    
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push({ day: null, isCurrentMonth: false });
     }
-
+    
     // Add days of the current month
     for (let i = 1; i <= daysInMonth; i++) {
       const currentDate = new Date(year, month, i);
-      const hasAppointment = appointments.some((apt) =>
+      const hasAppointment = appointments.some(apt => 
         isSameDay(parseISO(apt.appointment_datetime), currentDate)
       );
-
+      
       days.push({
         day: i,
         isCurrentMonth: true,
         date: currentDate,
         hasAppointment,
-        isToday: isToday(currentDate),
+        isToday: isToday(currentDate)
       });
     }
-
+    
     return days;
   };
 
@@ -85,32 +77,16 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
         <div className="flex items-center">
           <button
-            onClick={() =>
-              onDateChange(
-                new Date(
-                  selectedDate.getFullYear(),
-                  selectedDate.getMonth() - 1,
-                  1
-                )
-              )
-            }
+            onClick={() => onDateChange(new Date(selectedDate.getFullYear(), selectedDate.getMonth() - 1, 1))}
             className="p-1 rounded-full hover:bg-gray-100"
           >
             <ChevronLeft className="h-5 w-5 text-gray-600" />
           </button>
           <h2 className="text-lg font-medium text-gray-900 mx-4">
-            {format(selectedDate, "MMMM yyyy")}
+            {format(selectedDate, 'MMMM yyyy')}
           </h2>
           <button
-            onClick={() =>
-              onDateChange(
-                new Date(
-                  selectedDate.getFullYear(),
-                  selectedDate.getMonth() + 1,
-                  1
-                )
-              )
-            }
+            onClick={() => onDateChange(new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1))}
             className="p-1 rounded-full hover:bg-gray-100"
           >
             <ChevronRight className="h-5 w-5 text-gray-600" />
@@ -127,11 +103,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       {/* Calendar Grid */}
       <div className="p-4">
         <div className="grid grid-cols-7 gap-1 mb-2">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-            <div
-              key={day}
-              className="text-center text-sm font-medium text-gray-500 py-2"
-            >
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
               {day}
             </div>
           ))}
@@ -140,39 +113,20 @@ const CalendarView: React.FC<CalendarViewProps> = ({
           {generateCalendarDays().map((dayInfo, index) => (
             <button
               key={index}
-              onClick={() =>
-                dayInfo.day &&
-                onDateChange(
-                  new Date(
-                    selectedDate.getFullYear(),
-                    selectedDate.getMonth(),
-                    dayInfo.day
-                  )
-                )
-              }
+              onClick={() => dayInfo.day && onDateChange(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), dayInfo.day))}
               disabled={!dayInfo.isCurrentMonth}
               className={`
-                 aspect-[10/7] p-1 relative flex flex-col items-center justify-center
-                ${
-                  dayInfo.isCurrentMonth ? "hover:bg-gray-100" : "text-gray-300"
-                }
-                ${dayInfo.isToday ? "bg-blue-50" : ""}
-                ${
-                  isSameDay(selectedDate, dayInfo.date || new Date())
-                    ? "bg-blue-100"
-                    : ""
-                }
-                ${dayInfo.hasAppointment ? "bg-green-50" : ""}
+                aspect-square p-2 relative flex flex-col items-center justify-center
+                ${dayInfo.isCurrentMonth ? 'hover:bg-gray-100' : 'text-gray-300'}
+                ${dayInfo.isToday ? 'bg-blue-50' : ''}
+                ${isSameDay(selectedDate, dayInfo.date || new Date()) ? 'bg-blue-100' : ''}
+                ${dayInfo.hasAppointment ? 'bg-green-50' : ''}
                 rounded-lg
               `}
             >
               {dayInfo.day && (
                 <>
-                  <span
-                    className={`text-sm ${
-                      dayInfo.isToday ? "font-bold text-blue-600" : ""
-                    }`}
-                  >
+                  <span className={`text-sm ${dayInfo.isToday ? 'font-bold text-blue-600' : ''}`}>
                     {dayInfo.day}
                   </span>
                   {dayInfo.hasAppointment && (
@@ -186,27 +140,22 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       </div>
 
       {/* Selected Date Appointments */}
-      {selectedDateAppointments?.length > 0 && (
+      {selectedDateAppointments.length > 0 && (
         <div className="border-t border-gray-200 p-4">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Appointments for {format(selectedDate, "MMMM d, yyyy")}
+            Appointments for {format(selectedDate, 'MMMM d, yyyy')}
           </h3>
           <div className="space-y-4">
-            {selectedDateAppointments.map((appointment) => (
+            {selectedDateAppointments.map(appointment => (
               <div
                 key={appointment.id}
                 className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
               >
                 <div className="flex-1">
-                  <h4 className="text-sm font-medium text-gray-900">
-                    {appointment.name}
-                  </h4>
+                  <h4 className="text-sm font-medium text-gray-900">{appointment.name}</h4>
                   <div className="mt-1 flex items-center text-sm text-gray-500">
                     <Clock className="h-4 w-4 mr-1" />
-                    {format(
-                      parseISO(appointment.appointment_datetime),
-                      "h:mm a"
-                    )}
+                    {appointment.appointment_datetime.slice(11, 16)} UTC
                     {appointment.appointment_location && (
                       <>
                         <MapPin className="h-4 w-4 ml-3 mr-1" />

@@ -1,5 +1,5 @@
 import React from "react";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import {
   Mail,
   Phone,
@@ -57,7 +57,7 @@ const ListView: React.FC<ListViewProps> = ({
               scope="col"
               className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
             >
-              Date & Time
+              Date & Time (UTC)
             </th>
             <th
               scope="col"
@@ -107,7 +107,7 @@ const ListView: React.FC<ListViewProps> = ({
               <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                 <div className="flex items-center">
                   <CalendarIcon className="h-4 w-4 text-gray-400 mr-1" />
-                  {format(parseISO(appointment.appointment_datetime), "PPpp")}
+                  {appointment.appointment_datetime.slice(0, -1)} UTC
                 </div>
               </td>
               <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">

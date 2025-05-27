@@ -1,7 +1,6 @@
 import React from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { X, User, Mail, Phone, Calendar, MapPin, FileText } from "lucide-react";
-import { format, parseISO } from "date-fns";
 
 interface AppointmentViewModalProps {
   isOpen: boolean;
@@ -118,13 +117,10 @@ const AppointmentViewModal: React.FC<AppointmentViewModalProps> = ({
                         <Calendar className="h-5 w-5 text-gray-400" />
                         <div>
                           <p className="text-sm font-medium text-gray-500">
-                            Date & Time
+                            Date & Time (UTC)
                           </p>
                           <p className="text-base text-gray-900">
-                            {format(
-                              parseISO(appointment.appointment_datetime),
-                              "PPpp"
-                            )}
+                            {appointment.appointment_datetime.slice(0, -1)} UTC
                           </p>
                         </div>
                       </div>

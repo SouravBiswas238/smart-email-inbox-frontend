@@ -8,6 +8,7 @@ interface Category {
   name: string;
   description: string;
   instructions?: string;
+  target_emails?: string;
 }
 
 interface CategoryModalProps {
@@ -33,6 +34,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
       name: "",
       description: "",
       instructions: "",
+      target_emails: "",
     },
   });
 
@@ -44,12 +46,25 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
         name: "",
         description: "",
         instructions: "",
+        target_emails: "",
       });
     }
   }, [category, reset]);
 
   const onSubmit = (data: Category) => {
-    onSave(data);
+    // Clean up target emails - remove any extra spaces and empty entries
+    const cleanedEmails = data.target_emails
+      ? data.target_emails
+          .split(",")
+          .map((email) => email.trim())
+          .filter((email) => email)
+          .join(",")
+      : "";
+
+    onSave({
+      ...data,
+      target_emails: cleanedEmails,
+    });
     reset();
   };
 
@@ -119,14 +134,14 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                               message: "Name must be at least 2 characters",
                             },
                           })}
-                          className={`mt-1 p-2 block w-full rounded-md shadow-sm sm:text-sm ${
+                          className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
                             errors.name
                               ? "border-red-300 focus:border-red-500 focus:ring-red-500"
                               : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                           }`}
                         />
                         {errors.name && (
-                          <p className="mt-1 p-2 text-sm text-red-600">
+                          <p className="mt-1 text-sm text-red-600">
                             {errors.name.message}
                           </p>
                         )}
@@ -150,17 +165,36 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                                 "Description must be at least 10 characters",
                             },
                           })}
-                          className={`mt-1 p-2 block w-full rounded-md shadow-sm sm:text-sm ${
+                          className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
                             errors.description
                               ? "border-red-300 focus:border-red-500 focus:ring-red-500"
                               : "border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                           }`}
                         />
                         {errors.description && (
-                          <p className="mt-1 p-2 text-sm text-red-600">
+                          <p className="mt-1 text-sm text-red-600">
                             {errors.description.message}
                           </p>
                         )}
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="target_emails"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          Target Emails (comma-separated)
+                        </label>
+                        <input
+                          type="text"
+                          id="target_emails"
+                          {...register("target_emails")}
+                          placeholder="email1@example.com, email2@example.com"
+                          className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
+                        <p className="mt-1 text-sm text-gray-500">
+                          Enter multiple email addresses separated by commas
+                        </p>
                       </div>
 
                       <div>
@@ -174,7 +208,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                           id="instructions"
                           rows={3}
                           {...register("instructions")}
-                          className="mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                         />
                       </div>
 
